@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -116,90 +115,92 @@
 <footer>Presented by <b>K. Upendra Reddy</b> (1925260230), <b>D. Hasini</b> (192425147), <b>M. John Sukumar</b> (1925260288), <b>Dharanidaran D</b> (192521337) | Supervised by <b>Dr. H. Shree Kumar</b>, SIMATS Engineering</footer>
 
 <script>
-let lam=8, mu=10, c=1, spd=5, pau=false, t=0, arr=0, srv=0, q=[], srvs=[], nxt=0, wt=0, bt=0, qh=[], wh=[], ls=0;
-const exp = r => -Math.log(1-Math.random())/r;
-const fac = n => n<=1?1:n*fac(n-1);
+var lam=8, mu=10, c=1, spd=5, pau=false, t=0, arr=0, srv=0, q=[], srvs=[], nxt=0, wt=0, bt=0, qh=[], wh=[], ls=0;
+function exp(r) { return -Math.log(1-Math.random())/r; }
+function fac(n) { return n<=1?1:n*fac(n-1); }
 function setSpd(v) { spd = parseInt(v); document.getElementById('vs').innerHTML = spd + '&times;'; }
 function togPause() { pau = !pau; document.getElementById('bp').textContent = pau ? 'Resume' : 'Pause'; }
 function th() {
-  const rho = lam/(c*mu); if(rho>=1) return {ok:false,rho};
-  const a = lam/mu; let s=0; for(let k=0;k<c;k++) s+=Math.pow(a,k)/fac(k);
-  const last = (Math.pow(a,c)/fac(c))/(1-rho), pw = last/(s+last), lq = (pw*rho)/(1-rho), wq = (lq/lam)*1000;
-  return {ok:true, rho, lq, wq, w: wq+(1000/mu), tp: lam};
+  var rho = lam/(c*mu); if(rho>=1) return {ok:false,rho:rho};
+  var a = lam/mu, s=0; for(var k=0;k<c;k++) s+=Math.pow(a,k)/fac(k);
+  var last = (Math.pow(a,c)/fac(c))/(1-rho), pw = last/(s+last), lq = (pw*rho)/(1-rho), wq = (lq/lam)*1000;
+  return {ok:true, rho:rho, lq:lq, wq:wq, w: wq+(1000/mu), tp: lam};
 }
 function rst() {
-  t=0; arr=0; srv=0; q=[]; srvs=Array(c).fill(null); nxt=exp(lam); wt=0; bt=0; qh=[]; wh=[]; ls=0;
-  let h=''; for(let i=0;i<c;i++) h+=`<div class="blk srv"><b>Server ${i+1}<span class="dot" id="d${i}"></span></b><div style="font-size:10px;color:var(--mut)">&mu;=${mu}/s</div></div>`;
+  t=0; arr=0; srv=0; q=[]; srvs=[]; for(var j=0;j<c;j++) srvs.push(null);
+  nxt=exp(lam); wt=0; bt=0; qh=[]; wh=[]; ls=0;
+  var h=''; for(var i=0;i<c;i++) h+='<div class="blk srv"><b>Server '+(i+1)+'<span class="dot" id="d'+i+'"></span></b><div style="font-size:10px;color:var(--mut)">&mu;='+mu+'/s</div></div>';
   document.getElementById('sv').innerHTML=h; draw();
 }
 function upd() {
   lam=+document.getElementById('il').value; mu=+document.getElementById('im').value; c=+document.getElementById('ic').value;
   document.getElementById('vl').textContent=lam; document.getElementById('vm').textContent=mu; document.getElementById('vc').textContent=c;
-document.getElementById('mb').textContent=c===1?'M/M/1':'M/M/'+c; document.getElementById('bg-lbl').innerHTML=&lambda; = ${lam}/s; rst();
+document.getElementById('mb').textContent=c===1?'M/M/1':'M/M/'+c; document.getElementById('bg-lbl').innerHTML='λ = '+lam+'/s'; rst();
 }
 function pre(l,m,sc) { document.getElementById('il').value=l; document.getElementById('im').value=m; document.getElementById('ic').value=sc; upd(); }
 function step(dt) {
-const end=t+dt;
+var end=t+dt;
 while(t<end) {
-let ne=end, et='s', si=-1;
+var ne=end, et='s', si=-1;
 if(nxt<ne){ne=nxt;et='a';}
-for(let i=0;i<c;i++) if(srvs[i]!==null && srvs[i]<ne){ne=srvs[i];et='d';si=i;}
-bt += srvs.filter(x=>x!==null).length*(ne-t); t=ne;
-if(et==='a'){ arr++; let id=srvs.indexOf(null); if(id!==-1) srvs[id]=t+exp(mu); else q.push(t); nxt=t+exp(lam); }
+for(var i=0;i<c;i++) if(srvs[i]!==null && srvs[i]<ne){ne=srvs[i];et='d';si=i;}
+var busy=0; for(var b=0;b<c;b++) if(srvs[b]!==null) busy++;
+bt += busy*(ne-t); t=ne;
+if(et==='a'){ arr++; var id=srvs.indexOf(null); if(id!==-1) srvs[id]=t+exp(mu); else q.push(t); nxt=t+exp(lam); }
 else if(et==='d'){ srv++; if(q.length>0){ wt+=t-q.shift(); srvs[si]=t+exp(mu); } else srvs[si]=null; }
 }
 while(Math.floor(t)>ls){ ls++; qh.push(q.length); if(qh.length>50)qh.shift();
-const uw=q.reduce((a,x)=>a+(t-x),0); wh.push(arr>0?((wt+uw)/arr)1000:0); if(wh.length>50)wh.shift(); }
+var uw=0; for(var u=0;u<q.length;u++) uw+=(t-q[u]);
+wh.push(arr>0?((wt+uw)/arr)1000:0); if(wh.length>50)wh.shift(); }
 }
 function draw() {
-const T=th(); document.getElementById('clk').textContent=t.toFixed(1)+' s';
+var T=th(); document.getElementById('clk').textContent=t.toFixed(1)+' s';
 document.getElementById('qc').textContent=q.length; document.getElementById('sc').textContent=srv;
-document.getElementById('sum').textContent=Simulated ${Math.floor(t)} s | Arrived: ${arr} | Served: ${srv} | Waiting: ${q.length};
+document.getElementById('sum').textContent='Simulated '+Math.floor(t)+' s | Arrived: '+arr+' | Served: '+srv+' | Waiting: '+q.length;
 document.getElementById('alr').style.display=T.ok?'none':'block';
-let qhml=''; for(let i=0;i<Math.min(q.length,10);i++) qhml+=<div class="pkt ${T.ok?'':'bad'}"></div>;
+var qhml=''; for(var i=0;i<Math.min(q.length,10);i++) qhml+='';
 document.getElementById('qv').innerHTML=qhml;
-for(let i=0;i<c;i++){ const d=document.getElementById('d'+i); if(d) d.className='dot'+(srvs[i]!==null?' on':''); }
-const sRho=t>0?bt/(ct):0, uw=q.reduce((a,x)=>a+(t-x),0), sWq=arr>0?((wt+uw)/arr)1000:0, sLq=t>0?(wt+uw)/t:0, sW=sWq+(1000/mu), sTp=t>0?srv/t:0;
-const df=(a,b)=>(!T.ok||a===0)?'n/a':(Math.abs((b-a)/a)100).toFixed(1)+'%';
-const rows=[
+for(var i=0;i<c;i++){ var d=document.getElementById('d'+i); if(d) d.className='dot'+(srvs[i]!==null?' on':''); }
+var uw=0; for(var u=0;u<q.length;u++) uw+=(t-q[u]);
+var sRho=t>0?bt/(ct):0, sWq=arr>0?((wt+uw)/arr)1000:0, sLq=t>0?(wt+uw)/t:0, sW=sWq+(1000/mu), sTp=t>0?srv/t:0;
+function df(a,b){ return (!T.ok||a===0)?'n/a':(Math.abs((b-a)/a)100).toFixed(1)+'%'; }
+var rows=[
 ['Utilization ρ',T.ok?T.rho.toFixed(3):'n/a',sRho.toFixed(3),df(T.rho,sRho)],
 ['Queue Lq',T.ok?T.lq.toFixed(2):'n/a',sLq.toFixed(2),df(T.lq,sLq)],
 ['Wait Wq (ms)',T.ok?T.wq.toFixed(1):'n/a',sWq.toFixed(1),df(T.wq,sWq)],
 ['System W (ms)',T.ok?T.w.toFixed(1):'n/a',sW.toFixed(1),df(T.w,sW)],
 ['Throughput',T.ok?T.tp.toFixed(2):'n/a',sTp.toFixed(2),df(T.tp,sTp)]
 ];
-document.getElementById('tb').innerHTML=rows.map(r=><tr><td>${r[0]}</td><td class="r">${r[1]}</td><td class="r">${r[2]}</td><td class="r" style="color:var(--grn)">${r[3]}</td></tr>).join('');
-document.getElementById('t-m1').innerHTML=Arrival &lambda;=${lam}/s, Service &mu;=${mu}/s, Servers c=${c}. Condition &lambda; &lt; c&mu; is <b>${T.ok?'SATISFIED (Stable)':'VIOLATED (Overload)'}</b>.;
-document.getElementById('t-m2').innerHTML=Analytical &rho;=${T.rho.toFixed(3)}, Expected Queue Lq=${T.ok?T.lq.toFixed(2):'&infin;'}, Expected Wait Wq=${T.ok?T.wq.toFixed(1)+' ms':'&infin;'}.;
-document.getElementById('t-m3').innerHTML=Discrete-Event Engine: ${arr} arrivals generated, ${srv} departed sink, ${q.length} queued at t=${t.toFixed(1)}s.;
-document.getElementById('t-m4').innerHTML=Observed simulation Wq = ${sWq.toFixed(1)} ms vs Theoretical Wq = ${T.ok?T.wq.toFixed(1)+' ms':'Unstable'}.;
+var tbHtml='';
+for(var r=0;r<rows.length;r++) tbHtml+=''+rows[r]+''+rows[r]+''+rows[r]+''+rows[r]+'';
+document.getElementById('tb').innerHTML=tbHtml;
+document.getElementById('t-m1').innerHTML='Arrival λ='+lam+'/s, Service μ='+mu+'/s, Servers c='+c+'. Condition λ < cμ is '+(T.ok?'SATISFIED (Stable)':'VIOLATED (Overload)')+'.';
+document.getElementById('t-m2').innerHTML='Analytical ρ='+T.rho.toFixed(3)+', Expected Queue Lq='+(T.ok?T.lq.toFixed(2):'∞')+', Expected Wait Wq='+(T.ok?T.wq.toFixed(1)+' ms':'∞')+'.';
+document.getElementById('t-m3').innerHTML='Discrete-Event Engine: '+arr+' arrivals generated, '+srv+' departed sink, '+q.length+' queued at t='+t.toFixed(1)+'s.';
+document.getElementById('t-m4').innerHTML='Observed simulation Wq = '+sWq.toFixed(1)+' ms vs Theoretical Wq = '+(T.ok?T.wq.toFixed(1)+' ms':'Unstable')+'.';
 plt('c1',qh,T.ok?T.lq:null); plt('c2',wh,T.ok?T.wq:null);
 }
-function plt(id,arr,ref) {
-const cv=document.getElementById(id), ctx=cv.getContext('2d'); ctx.clearRect(0,0,cv.width,cv.height);
-if(arr.length<2) return; const mx=Math.max(10,...arr,ref?ref1.4:10);
-if(ref!==null){ const y=cv.height-10-(ref/mx)(cv.height-20); ctx.strokeStyle='#10b981'; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(cv.width,y); ctx.stroke(); }
+function plt(id,data,ref) {
+var cv=document.getElementById(id), ctx=cv.getContext('2d'); ctx.clearRect(0,0,cv.width,cv.height);
+if(data.length<2) return;
+var mx=10; for(var i=0;i<data.length;i++) if(data[i]>mx) mx=data[i];
+if(ref!==null && ref1.4>mx) mx=ref1.4;
+if(ref!==null){ var y=cv.height-10-(ref/mx)*(cv.height-20); ctx.strokeStyle='#10b981'; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(cv.width,y); ctx.stroke(); }
 ctx.strokeStyle='#38bdf8'; ctx.lineWidth=2; ctx.beginPath();
-arr.forEach((v,i)=>{ const x=(i/(arr.length-1))cv.width, y=cv.height-10-(v/mx)(cv.height-20); i===0?ctx.moveTo(x,y):ctx.lineTo(x,y); }); ctx.stroke();
+for(var i=0;i<data.length;i++){ var x=(i/(data.length-1))cv.width, y=cv.height-10-(data[i]/mx)(cv.height-20); i===0?ctx.moveTo(x,y):ctx.lineTo(x,y); }
+ctx.stroke();
 }
 function showTab(id,btn) {
-document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active')); btn.classList.add('active');
-document.querySelectorAll('.view').forEach(v=>v.classList.remove('active')); document.getElementById('v-'+id).classList.add('active');
+var tabs=document.querySelectorAll('.tab'); for(var i=0;i<tabs.length;i++) tabs[i].classList.remove('active');
+btn.classList.add('active');
+var views=document.querySelectorAll('.view'); for(var i=0;i<views.length;i++) views[i].classList.remove('active');
+document.getElementById('v-'+id).classList.add('active');
 }
 function csv() {
-const T=th(), b=new Blob([lambda,mu,c,sim_time,arrived,served,theory_Wq_ms\n${lam},${mu},${c},${t.toFixed(1)},${arr},${srv},${T.ok?T.wq.toFixed(1):'Unstable'}],{type:'text/csv'});
-const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='Validation_Report.csv'; a.click();
+var T=th(), b=new Blob(['lambda,mu,c,sim_time,arrived,served,theory_Wq_ms\n'+lam+','+mu+','+c+','+t.toFixed(1)+','+arr+','+srv+','+(T.ok?T.wq.toFixed(1):'Unstable')],{type:'text/csv'});
+var a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='Validation_Report.csv'; a.click();
 }
-let lf=performance.now();
-function loop(now){ const dt=(now-lf)/1000; lf=now; if(!pau){ step(Math.min(dt,0.1)*spd); draw(); } requestAnimationFrame(loop); }
+var lf=performance.now();
+function loop(now){ var dt=(now-lf)/1000; lf=now; if(!pau){ step(Math.min(dt,0.1)*spd); draw(); } requestAnimationFrame(loop); }
 rst(); requestAnimationFrame(loop);
-
-
-
-
-Tap **Commit changes**, wait 45 seconds, and refresh **`dharanidarand.github.io/CSA0712-Network-Predictor/`**. Every button, slider, tab, and packet animation will immediately come alive!
-
-<FollowUp>
-Once you commit this update and refresh **`dharanidarand.github.io/CSA0712-Network-Predictor/`**, let me know if all buttons and animations are working smoothly!
-</FollowUp>
 

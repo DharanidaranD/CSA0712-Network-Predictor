@@ -135,7 +135,6 @@ function rst() {
 function upd() {
   lam=+document.getElementById('il').value; mu=+document.getElementById('im').value; c=+document.getElementById('ic').value;
   document.getElementById('vl').textContent=lam; document.getElementById('vm').textContent=mu; document.getElementById('vc').textContent=c;
-Use code with caution.
 document.getElementById('mb').textContent=c===1?'M/M/1':'M/M/'+c; document.getElementById('bg-lbl').innerHTML=&lambda; = ${lam}/s; rst();
 }
 function pre(l,m,sc) { document.getElementById('il').value=l; document.getElementById('im').value=m; document.getElementById('ic').value=sc; upd(); }
@@ -194,4 +193,13 @@ const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='
 let lf=performance.now();
 function loop(now){ const dt=(now-lf)/1000; lf=now; if(!pau){ step(Math.min(dt,0.1)*spd); draw(); } requestAnimationFrame(loop); }
 rst(); requestAnimationFrame(loop);
+
+
+
+
+Tap **Commit changes**, wait 45 seconds, and refresh **`dharanidarand.github.io/CSA0712-Network-Predictor/`**. Every button, slider, tab, and packet animation will immediately come alive!
+
+<FollowUp>
+Once you commit this update and refresh **`dharanidarand.github.io/CSA0712-Network-Predictor/`**, let me know if all buttons and animations are working smoothly!
+</FollowUp>
 
